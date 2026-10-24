@@ -1,0 +1,41 @@
+name: Bounded security research
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - "research/**"
+      - ".github/workflows/security-research.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dateutil-security-research
+  cancel-in-progress: true
+
+jobs:
+  reproduce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout isolated non-fork copy
+        uses: actions/checkout@v4
+
+      - name: Use Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Test bounded reproduction and localhost-only HTTP scenario
+        run: python research/validate.py all --output research/results/latest.json
+
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dateutil-rruleset-evidence
+          path: research/results/latest.json
+          if-no-files-found: warn
+          retention-days: 14

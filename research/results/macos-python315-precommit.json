@@ -1,0 +1,98 @@
+{
+  "benchmarks": [
+    {
+      "count": 1000,
+      "cpu_s": 0.029574,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.040594
+    },
+    {
+      "count": 1000,
+      "cpu_s": 0.012635,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.012633
+    },
+    {
+      "count": 10000,
+      "cpu_s": 0.010247,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.010254
+    },
+    {
+      "count": 10000,
+      "cpu_s": 0.033258,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.033284
+    },
+    {
+      "count": 100000,
+      "cpu_s": 0.010175,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.01018
+    },
+    {
+      "count": 100000,
+      "cpu_s": 0.237717,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.237864
+    },
+    {
+      "count": 300000,
+      "cpu_s": 0.010147,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.010152
+    },
+    {
+      "count": 300000,
+      "cpu_s": 0.695328,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.69581
+    }
+  ],
+  "dateutil_version": "unknown",
+  "http_simulation": {
+    "baseline": {
+      "client_wall_s": 0.03471,
+      "cpu_s": 0.010654,
+      "http_status": 200,
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.010656
+    },
+    "benign_request_behind_excluded": {
+      "client_wall_s": 0.627266,
+      "cpu_s": 6.8e-05,
+      "http_status": 200,
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 6.8e-05
+    },
+    "excluded_request": {
+      "client_wall_s": 0.677734,
+      "cpu_s": 0.676513,
+      "http_status": 200,
+      "next_event": null,
+      "wall_s": 0.676865
+    },
+    "observed_head_of_line_delay": true,
+    "scope": "purpose-built single-worker service, loopback only"
+  },
+  "issue": "https://github.com/dateutil/dateutil/issues/1094",
+  "max_count": 300000,
+  "per_worker_timeout_s": 12,
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "python": "3.15.0",
+  "security_assessment": {
+    "CVE_eligibility": "unverified; no CVE requested or assigned",
+    "http_input_to_sink": "tested on local constructed demonstration service only",
+    "real_world_remote_exploit": "not established",
+    "resource_exhaustion": "bounded CPU cost confirmed if wall/CPU scaling observed"
+  },
+  "source": "upstream dateutil master independent non-fork copy"
+}
