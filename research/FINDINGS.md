@@ -218,6 +218,14 @@ different auth/RBAC and tenancy architectures. This experiment did
 not prove an untrusted actor can affect a separate user's workload.
 The result should not be described as a CVE or remotely exploitable DoS.
 
+GitHub-hosted replication also passed, with all three workflow jobs successful:
+https://github.com/Johnny-Kao/dateutil-security-research/actions/runs/40126649507
+The Prefect job used Python 3.13.16 on Linux x86_64 and uploaded
+`dateutil-prefect-evidence`. With 100,000 fully excluded candidates it
+recorded 0.739081 CPU seconds and a 0.749329-second 10ms timer completion,
+versus 0.000989 CPU seconds and a 0.011142-second timer for the control.
+These are bounded single-run measurements, not an outage demonstration.
+
 ## F. CVE threshold — not established
 
 - The algorithmic cost was previously disclosed in issue #1094 (2020).
