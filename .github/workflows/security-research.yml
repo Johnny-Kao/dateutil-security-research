@@ -2,11 +2,6 @@ name: Bounded security research
 
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
-    paths:
-      - "research/**"
-      - ".github/workflows/security-research.yml"
 
 permissions:
   contents: read
