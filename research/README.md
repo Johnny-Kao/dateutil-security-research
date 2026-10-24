@@ -56,6 +56,23 @@ python research/integrate_times_square.py \
 This is a code-level downstream compatibility/availability reproduction,
 **not** proof of a remotely exploitable Times Square deployment.
 
+## Reproduce Prefect release 3.9.0 scheduling model locally
+
+Install Prefect in a separate Python 3.13 environment (`prefect==3.9.0`) and run:
+
+~~~shell
+python research/integrate_prefect.py \
+  --output research/results/prefect-latest.json
+~~~
+
+This checks Prefect's actual `DeploymentScheduleCreate` Pydantic model and
+`RRuleSchedule.get_dates()` with finite counts of at most 100,000 and an
+unrelated 10ms timer in the same asyncio event loop. Six independent child
+processes each have an eight-second timeout. This is **not** an API-server
+request, a Prefect Cloud test, an authorization bypass, or proof of
+cross-user impact. Prefect Cloud and self-hosted open source have different
+authentication / tenancy models.
+
 ## Interpreting the HTTP test
 
 The included server is purpose-built and deliberately single-threaded. It

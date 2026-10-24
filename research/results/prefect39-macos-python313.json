@@ -1,0 +1,65 @@
+{
+  "child_timeout_seconds": 8.0,
+  "classification": "real Prefect API model and asyncio schema-level integration, not an end-to-end service or cross-user exploit",
+  "dateutil_upstream_baseline": "64914d9bcf987f0a6a8de77c3d07cc26f06185c9",
+  "max_candidate_count": 100000,
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "prefect_version": "3.9.0",
+  "python": "3.13.16",
+  "results": [
+    {
+      "all_excluded": false,
+      "api_schema_accepted": true,
+      "count": 1000,
+      "date_count": 1,
+      "schedule_cpu_s": 0.000453,
+      "schedule_wall_s": 0.000463,
+      "ten_ms_timer_wall_s": 0.0115
+    },
+    {
+      "all_excluded": true,
+      "api_schema_accepted": true,
+      "count": 1000,
+      "date_count": 0,
+      "schedule_cpu_s": 0.003264,
+      "schedule_wall_s": 0.003272,
+      "ten_ms_timer_wall_s": 0.013603
+    },
+    {
+      "all_excluded": false,
+      "api_schema_accepted": true,
+      "count": 10000,
+      "date_count": 1,
+      "schedule_cpu_s": 0.000429,
+      "schedule_wall_s": 0.000438,
+      "ten_ms_timer_wall_s": 0.011169
+    },
+    {
+      "all_excluded": true,
+      "api_schema_accepted": true,
+      "count": 10000,
+      "date_count": 0,
+      "schedule_cpu_s": 0.028589,
+      "schedule_wall_s": 0.028614,
+      "ten_ms_timer_wall_s": 0.039651
+    },
+    {
+      "all_excluded": false,
+      "api_schema_accepted": true,
+      "count": 100000,
+      "date_count": 1,
+      "schedule_cpu_s": 0.000442,
+      "schedule_wall_s": 0.000451,
+      "ten_ms_timer_wall_s": 0.010505
+    },
+    {
+      "all_excluded": true,
+      "api_schema_accepted": true,
+      "count": 100000,
+      "date_count": 0,
+      "schedule_cpu_s": 0.281569,
+      "schedule_wall_s": 0.281672,
+      "ten_ms_timer_wall_s": 0.292394
+    }
+  ]
+}

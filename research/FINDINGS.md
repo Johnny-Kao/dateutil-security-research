@@ -183,7 +183,42 @@ uploaded independent JSON artifacts. On that Linux run:
 The pinned Times Square checkout and execution are local to the GitHub
 Actions job; no third-party service was contacted or assessed as vulnerable.
 
-## E. CVE threshold — not established
+## E. Prefect 3.9.0 scheduling-model integration
+
+Reproduced with the actual public Prefect release `3.9.0`, using
+`DeploymentScheduleCreate` (API action schema) and the server-side
+`RRuleSchedule.get_dates()`. The Python process loads the dateutil copy
+from this repository. All rules are finite (`COUNT <= 100000`);
+each child has an 8-second timeout. No real server, network account, or
+external service was tested.
+
+macOS arm64, Python 3.13.16, single-run observations:
+
+| Candidate count | Normal CPU s | Fully excluded CPU s | Normal 10ms timer s | Excluded 10ms timer s |
+| ---: | ---: | ---: | ---: | ---: |
+| 1,000 | 0.000453 | 0.003264 | 0.011500 | 0.013603 |
+| 10,000 | 0.000429 | 0.028589 | 0.011169 | 0.039651 |
+| 100,000 | 0.000442 | 0.281569 | 0.010505 | 0.292394 |
+
+The API action schema accepted all six tested shapes. Prefect's
+`MAX_ITERATIONS=1000` check is downstream of the dateutil iterator's next
+yield; it cannot interrupt candidate evaluation when no result is yielded.
+The in-process benign timer is therefore delayed by the synchronous
+evaluation. Evidence: `research/results/prefect39-macos-python313.json`;
+reproducer: `research/integrate_prefect.py`.
+
+The upstream `POST /deployments/{id}/schedules` route accepts
+`DeploymentScheduleCreate`, and the shared background scheduler calls
+`_generate_scheduled_flow_runs`, which iterates this model. This is
+source-level reachability, **not** an authenticated end-to-end server
+demonstration.
+
+**Security caveat:** self-hosted Prefect OSS and Prefect Cloud have
+different auth/RBAC and tenancy architectures. This experiment did
+not prove an untrusted actor can affect a separate user's workload.
+The result should not be described as a CVE or remotely exploitable DoS.
+
+## F. CVE threshold — not established
 
 - The algorithmic cost was previously disclosed in issue #1094 (2020).
 - No real vulnerable downstream deployment was identified or tested.
