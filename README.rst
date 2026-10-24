@@ -1,3 +1,19 @@
+Independent dateutil security research copy
+=========================================
+
+This is an independent public research copy, **not** the official python-dateutil
+repository and **not** a GitHub fork. It preserves upstream source and documents
+bounded performance/availability investigations of an existing public report:
+`dateutil #1094 <https://github.com/dateutil/dateutil/issues/1094>`_.
+
+- `Research plan and safety limits <research/README.md>`_
+- `Findings and evidence <research/FINDINGS.md>`_
+- `GitHub Actions <https://github.com/Johnny-Kao/dateutil-security-research/actions>`_
+
+The original project and its documentation follow below.
+
+----
+
 dateutil - powerful extensions to datetime
 ==========================================
 

@@ -37,3 +37,41 @@ jobs:
           path: research/results/latest.json
           if-no-files-found: warn
           retention-days: 14
+
+  downstream-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout independent dateutil research
+        uses: actions/checkout@v4
+
+      - name: Checkout pinned Times Square source for local testing only
+        uses: actions/checkout@v4
+        with:
+          repository: lsst-sqre/times-square
+          ref: 4ed70b6c01094b7d00e20432049d4e796af6869d
+          path: research/third-party/times-square
+          persist-credentials: false
+
+      - name: Use Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install scheduler model validation dependency
+        run: python -m pip install "pydantic==2.14.1"
+
+      - name: Evaluate bounded genuine downstream scheduling classes
+        run: |
+          python research/integrate_times_square.py \
+            --source-root research/third-party/times-square \
+            --output research/results/times-square-latest.json
+
+      - name: Preserve downstream evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dateutil-times-square-evidence
+          path: research/results/times-square-latest.json
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,54 @@
+{
+  "classification": "local code-level integration; not a remote exploit",
+  "dateutil_upstream_baseline": "64914d9bcf987f0a6a8de77c3d07cc26f06185c9",
+  "max_count": 100000,
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "python": "3.14.6",
+  "results": [
+    {
+      "all_excluded": false,
+      "count": 1000,
+      "cpu_s": 0.000322,
+      "next_occurrence": "2025-01-01T00:00:00+00:00",
+      "wall_s": 0.000956
+    },
+    {
+      "all_excluded": true,
+      "count": 1000,
+      "cpu_s": 0.002881,
+      "next_occurrence": null,
+      "wall_s": 0.002886
+    },
+    {
+      "all_excluded": false,
+      "count": 10000,
+      "cpu_s": 0.000104,
+      "next_occurrence": "2025-01-01T00:00:00+00:00",
+      "wall_s": 0.000105
+    },
+    {
+      "all_excluded": true,
+      "count": 10000,
+      "cpu_s": 0.027745,
+      "next_occurrence": null,
+      "wall_s": 0.027769
+    },
+    {
+      "all_excluded": false,
+      "count": 100000,
+      "cpu_s": 0.0001,
+      "next_occurrence": "2025-01-01T00:00:00+00:00",
+      "wall_s": 0.000103
+    },
+    {
+      "all_excluded": true,
+      "count": 100000,
+      "cpu_s": 0.279214,
+      "next_occurrence": null,
+      "wall_s": 0.279492
+    }
+  ],
+  "source": "lsst-sqre/times-square",
+  "source_sha": "4ed70b6c01094b7d00e20432049d4e796af6869d",
+  "timeout_per_case_s": 8
+}

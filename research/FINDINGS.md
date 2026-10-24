@@ -2,7 +2,7 @@
 
 ## Scope and provenance
 
-- Repository: private, independent non-fork copy of dateutil/dateutil
+- Repository: public, independent non-fork copy of dateutil/dateutil
 - Upstream baseline: `64914d9bcf987f0a6a8de77c3d07cc26f06185c9`
 - Initial research commit: `eee7d97747f15d64a5fb3f6a6551e86351ea2a19`
 - Source path: `src/dateutil/rrule.py`, in particular `rruleset._iter()`
@@ -97,7 +97,79 @@ APIs. For example:
 matching unlimited rules, and whether service-level limits permit disruption,
 are **not verified**. These are code-path references, not vulnerability claims.
 
-## C. CVE threshold — not established
+## C. Real downstream scheduler — local code-level integration
+
+Local test uses the actual `lsst-sqre/times-square` modules
+`timessquare.domain.schedulerule` and `timessquare.domain.schedule`
+from source revision `4ed70b6c01094b7d00e20432049d4e796af6869d`.
+Pydantic validates the schedule JSON and the genuine
+`RunSchedule.next()` invokes dateutil's `rruleset.after()`.
+
+The test uses only finite 1,000 / 10,000 / 100,000-candidate rules in
+short-lived local child processes (eight-second timeout). macOS arm64,
+Python 3.14.6, one observation per case:
+
+| Candidates | Normal CPU seconds | Identical exclusion CPU seconds |
+| ---: | ---: | ---: |
+| 1,000 | 0.000322 | 0.002881 |
+| 10,000 | 0.000104 | 0.027745 |
+| 100,000 | 0.000100 | 0.279214 |
+
+Evidence: `research/results/times-square-macos-python314.json`.
+Reproducer: `research/integrate_times_square.py`.
+
+This establishes algorithmic cost **inside a real downstream library's
+scheduling classes**, but not an attack on its running service.
+
+### Times Square trust-boundary review
+
+Source inspection of the same pinned commit found:
+- Schedule input comes from GitHub-backed notebook YAML sidecar files and is
+  validated with Pydantic. `ScheduleFromDate` supports an optional `count`
+  and `end`; the scheduler can create corresponding inclusion/exclusion
+  rules, including rules without either termination parameter.
+- The GitHub App webhook uses signature verification. GitHub installation
+  handling is restricted to configured accepted organizations. The push
+  handler processes default-branch events.
+- `RunSchedulerService.schedule_due_runs()` checks stored enabled page
+  schedules, with `RunSchedule.next()` doing synchronous evaluation.
+  The cron scheduling job has a 60-second task timeout, but that is not
+  evidence of a per-rule computation budget.
+- The ordinary `POST /pages` request schema does not accept schedule
+  definitions as a field. No public anonymous schedule-write API was found
+  during this code review.
+
+**Security impact remains unverified:** no permission bypass, untrusted
+write path, production deployment vulnerability, or actual multi-user
+denial-of-service has been demonstrated. Only local cloned code was executed.
+
+For contrast, `boosh/django_recurring` uses `rruleset.after()` but its
+reviewed rule-building path constructs `rrule()` with exclusions as
+`exdate()`, not a direct `exrule()` path. The precise #1094 trigger is
+therefore not established in that library.
+
+## D. GitHub-hosted validation after repository became public
+
+The initial GitHub run `40116088729` failed before runner execution
+due to the account billing/spending-limit block. It was **not** a test result.
+
+A new public-repository workflow-dispatch run completed successfully:
+https://github.com/Johnny-Kao/dateutil-security-research/actions/runs/40117754779
+
+Its artifact is `dateutil-rruleset-evidence`, Linux x86_64, Python
+3.13.16, using the copied dateutil source. Selected single-run values:
+
+| Scenario | CPU seconds |
+| --- | ---: |
+| 300,000 candidates without exclusion | 0.020392 |
+| 300,000 candidates fully excluded | 2.129871 |
+
+The loopback HTTP demonstration observed a 2.076800-second client wall
+time for an unrelated normal request queued behind the expensive request,
+while its own computation was 0.000224 seconds. This is a *toy service*
+head-of-line delay, not a remotely exploited downstream product.
+
+## E. CVE threshold — not established
 
 - The algorithmic cost was previously disclosed in issue #1094 (2020).
 - No real vulnerable downstream deployment was identified or tested.
@@ -108,22 +180,9 @@ are **not verified**. These are code-path references, not vulnerability claims.
 A CVE is an identifier assigned through appropriate vulnerability coordination;
 it cannot be produced or confirmed by a test-suite PASS alone.
 
-## GitHub Actions status
-
-A workflow run was triggered after commit `eee7d97`:
-
-https://github.com/Johnny-Kao/dateutil-security-research/actions/runs/40116088729
-
-**FAILED before runner execution**: the GitHub job shows runner_id 0, an empty
-runner name, and zero execution steps. The GitHub CLI run annotation explicitly
-states: "The job was not started because recent account payments have failed or
-your spending limit needs to be increased. Please check the 'Billing & plans'
-section in your settings." Consequently this is **not** a GitHub-hosted
-validation result and cannot be called CI PASS. We did not enable paid runners.
-
-The research workflow has been changed to **manual dispatch only** to prevent
-automatic retry/failure on each research commit. It can be triggered when a
-runner is available.
+The research workflow remains **manual dispatch only** and has a five-minute
+timeout per GitHub job. Public-repository Actions ran successfully without
+enabling paid runners. See section D for run links and evidence.
 
 ## Next decision
 

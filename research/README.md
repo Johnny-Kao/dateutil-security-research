@@ -1,6 +1,6 @@
 # dateutil security research — bounded reproduction
 
-This is an **independent private non-fork copy** of dateutil/dateutil, made
+This is an **independent public non-fork copy** of dateutil/dateutil, made
 to test [dateutil issue #1094](https://github.com/dateutil/dateutil/issues/1094)
 against the current source without changing upstream. The initial upstream
 baseline is commit 64914d9bcf987f0a6a8de77c3d07cc26f06185c9.
@@ -36,6 +36,25 @@ The script imports the checked-out src/dateutil directly; it uses only the
 Python standard library. In an Actions run, the CI JSON artifact contains
 platform, Python version, results and limits. Read values rather than inferring
 them from a passing workflow check alone.
+
+## Reproduce actual downstream scheduler code locally
+
+The optional Times Square integration test uses the actual source code of
+`lsst-sqre/times-square`, pinned to commit
+`4ed70b6c01094b7d00e20432049d4e796af6869d`.
+It needs Python 3.14 and Pydantic 2.14.1, but does not run its server or
+contact an external target. The GitHub workflow checks out the pinned source
+and runs this case separately. Maximum 100,000 finite candidates; each child
+has an eight-second timeout.
+
+~~~shell
+python research/integrate_times_square.py \
+  --source-root research/third-party/times-square \
+  --output research/results/times-square-latest.json
+~~~
+
+This is a code-level downstream compatibility/availability reproduction,
+**not** proof of a remotely exploitable Times Square deployment.
 
 ## Interpreting the HTTP test
 
