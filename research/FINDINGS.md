@@ -35,8 +35,9 @@ Raw evidence: `research/results/macos-python315-precommit.json`.
 
 ## B. HTTP input to sink — demonstrated only in a controlled localhost service
 
-The included toy handler accepts bounded count/exclusion parameters and calls
-`rrulestr(..., forceset=True).after(...)`. It is deliberately single-threaded.
+The initial toy handler accepted bounded count/exclusion parameters. The second
+pass (below) accepts bounded client-supplied recurrence text instead. Both call
+`rrulestr(..., forceset=True).after(...)` on a single-threaded demo server.
 Two overlapping requests demonstrate head-of-line blocking:
 
 | Local request | Client wall seconds | Server computation seconds |
@@ -53,6 +54,48 @@ consumer is remotely exploitable**.
 Further evidence would require an identified real deployment accepting
 attacker-controlled recurrence rules, including verification of rate limits,
 request timeouts, process model, and measurable service impact.
+
+## B2. Second pass — client-controlled recurrence text, bounded and loopback-only
+
+The HTTP demonstration now accepts the recurrence text itself in a JSON
+`rrule_text` field, and passes that validated string to
+`rrulestr(..., forceset=True).after(...)`. It does **not** simply map an HTTP
+boolean to a hardcoded dangerous rule. For safety, the test server accepts
+only finite `FREQ=MINUTELY` rules with `COUNT <= 300000`, and a matching
+optional EXRULE. It rejects unbounded, mismatched, or unsupported syntax.
+
+Mac arm64, Python 3.15.0, second single-run observation:
+
+| Scenario | Client wall seconds | Server computation seconds |
+| --- | ---: | ---: |
+| Normal recurrence (300,000 available) | 0.028349 | 0.010955 |
+| Client-supplied RRULE plus matching EXRULE (300,000) | 0.683417 | 0.682541 |
+| Unrelated normal request queued behind it | 0.632044 | 0.000124 |
+
+All three requests returned HTTP 200. Four invalid/unbounded parameter forms
+were rejected in a direct input-boundary check. The new formal regression
+tests also cover finite evaluation and the local HTTP input path.
+
+Evidence: `research/results/macos-python315-raw-http.json` and
+`research/test_security.py`.
+
+**Interpretation:** the client-to-parser trust boundary is real in this
+constructed loopback demonstration, and application head-of-line blocking is
+reproducible here. This still does not establish a remote security flaw in any
+real deployed product.
+
+## Downstream source reconnaissance (no external execution)
+
+Read-only GitHub code review located consumers that use dateutil's recurrence
+APIs. For example:
+- `lsst-sqre/times-square` has `schedule.py` code that reconstructs dateutil
+  RRULE/EXRULE sets from schedule JSON and calls `rruleset.after()`.
+- `boosh/django_recurring` uses dateutil `rruleset.after()` to calculate
+  stored calendar occurrences.
+
+**Neither was remotely tested.** Whether untrusted external users can supply
+matching unlimited rules, and whether service-level limits permit disruption,
+are **not verified**. These are code-path references, not vulnerability claims.
 
 ## C. CVE threshold — not established
 

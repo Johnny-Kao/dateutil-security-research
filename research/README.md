@@ -28,6 +28,7 @@ baseline is commit 64914d9bcf987f0a6a8de77c3d07cc26f06185c9.
 From this repository root:
 
 ~~~shell
+python3 -m unittest discover -s research -p 'test_*.py' -v
 python3 research/validate.py all --output research/results/latest.json
 ~~~
 
@@ -38,8 +39,9 @@ them from a passing workflow check alone.
 
 ## Interpreting the HTTP test
 
-The included server is purpose-built and deliberately single-threaded: it
-models one *possible* downstream misuse to test input-to-sink reachability
+The included server is purpose-built and deliberately single-threaded. It
+accepts strictly bounded recurrence text via HTTP JSON and models one
+*possible* downstream misuse to test input-to-sink reachability
 and head-of-line blocking. Its exposure is loopback-only and it is **not** a
 real, identified vulnerable product. A real-world remote DoS claim requires
 separate evidence of an attacker-controlled ingress, resource limits, process

@@ -27,6 +27,28 @@ QUERY_TIME = START - timedelta(minutes=1)
 MAX_COUNT = 300_000
 HTTP_LIMIT = 16_384
 WORKER_TIMEOUT_S = 12
+UPSTREAM_BASELINE = "64914d9bcf987f0a6a8de77c3d07cc26f06185c9"
+
+
+def validate_rule_text(value: object) -> str:
+    """Accept only a short, finite test-specific recurrence syntax."""
+    if not isinstance(value, str) or len(value) > HTTP_LIMIT:
+        raise ValueError("Invalid rule text or size")
+    parts = value.splitlines()
+    if len(parts) not in (2, 3) or parts[0] != "DTSTART:20250101T000000":
+        raise ValueError("Only bounded laboratory recurrence rules are accepted")
+    prefix = "RRULE:FREQ=MINUTELY;COUNT="
+    if not parts[1].startswith(prefix):
+        raise ValueError("RRULE format outside laboratory scope")
+    count_str = parts[1][len(prefix):]
+    if not count_str.isascii() or not count_str.isdecimal() or len(count_str) > 6:
+        raise ValueError("Invalid finite COUNT")
+    count = int(count_str)
+    if count < 1 or count > MAX_COUNT:
+        raise ValueError("COUNT exceeds laboratory cap")
+    if len(parts) == 3 and parts[2] != f"EXRULE:FREQ=MINUTELY;COUNT={count}":
+        raise ValueError("Only matching bounded EXRULE is permitted")
+    return value
 
 
 def rule_text(count: int, exclude: bool) -> str:
@@ -63,13 +85,11 @@ class LocalHandler(BaseHTTPRequestHandler):
                 self.send_error(413)
                 return
             payload = json.loads(self.rfile.read(length))
-            count = payload["count"]
-            if type(count) is not int or not 1 <= count <= MAX_COUNT:
-                raise ValueError("count outside safe test range")
-            exclude = payload["exclude"]
-            if type(exclude) is not bool:
-                raise ValueError("exclude must be bool")
-            result = evaluate(rule_text(count, exclude))
+            if not isinstance(payload, dict):
+                raise ValueError("Expected JSON object")
+            # Test source text crosses the HTTP boundary unchanged.
+            # Validate it tightly so this laboratory cannot run unbounded rules.
+            result = evaluate(validate_rule_text(payload["rrule_text"]))
             status = 200
         except (KeyError, ValueError, TypeError, json.JSONDecodeError) as exc:
             result = {"error": str(exc)}
@@ -126,7 +146,7 @@ def local_http_case(count: int) -> dict:
         url = f"http://127.0.0.1:{info['port']}/calendar/next"
 
         def request(exclude: bool):
-            payload = json.dumps({"count": count, "exclude": exclude}).encode()
+            payload = json.dumps({"rrule_text": rule_text(count, exclude)}).encode()
             req = urllib.request.Request(
                 url, data=payload,
                 headers={"Content-Type": "application/json"},
@@ -151,6 +171,7 @@ def local_http_case(count: int) -> dict:
         assert excluded["next_event"] is None
         return {
             "scope": "purpose-built single-worker service, loopback only",
+            "ingress": "HTTP JSON rrule_text supplied by client, passed to rrulestr",
             "baseline": baseline,
             "excluded_request": excluded,
             "benign_request_behind_excluded": delayed,
@@ -174,7 +195,8 @@ def research_all() -> dict:
     http = local_http_case(MAX_COUNT)
     return {
         "source": "upstream dateutil master independent non-fork copy",
-        "source_commit": subprocess.run(
+        "upstream_baseline_commit": UPSTREAM_BASELINE,
+        "research_commit": subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True, capture_output=True,
             check=True,
         ).stdout.strip(),

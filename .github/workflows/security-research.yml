@@ -23,7 +23,10 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Test bounded reproduction and localhost-only HTTP scenario
+      - name: Run bounded regression assertions
+        run: python -m unittest discover -s research -p 'test_*.py' -v
+
+      - name: Measure bounded resource usage and localhost HTTP blocking
         run: python research/validate.py all --output research/results/latest.json
 
       - name: Preserve evidence

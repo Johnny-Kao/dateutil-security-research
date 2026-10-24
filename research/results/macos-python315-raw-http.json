@@ -1,0 +1,101 @@
+{
+  "benchmarks": [
+    {
+      "count": 1000,
+      "cpu_s": 0.012977,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.02304
+    },
+    {
+      "count": 1000,
+      "cpu_s": 0.013346,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.013588
+    },
+    {
+      "count": 10000,
+      "cpu_s": 0.011295,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.011582
+    },
+    {
+      "count": 10000,
+      "cpu_s": 0.034435,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.034659
+    },
+    {
+      "count": 100000,
+      "cpu_s": 0.010597,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.010626
+    },
+    {
+      "count": 100000,
+      "cpu_s": 0.237359,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.237694
+    },
+    {
+      "count": 300000,
+      "cpu_s": 0.010457,
+      "kind": "normal",
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.01046
+    },
+    {
+      "count": 300000,
+      "cpu_s": 0.689538,
+      "kind": "excluded",
+      "next_event": null,
+      "wall_s": 0.690464
+    }
+  ],
+  "dateutil_version": "unknown",
+  "http_simulation": {
+    "baseline": {
+      "client_wall_s": 0.028349,
+      "cpu_s": 0.010949,
+      "http_status": 200,
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.010955
+    },
+    "benign_request_behind_excluded": {
+      "client_wall_s": 0.632044,
+      "cpu_s": 0.000125,
+      "http_status": 200,
+      "next_event": "2025-01-01T00:00:00",
+      "wall_s": 0.000124
+    },
+    "excluded_request": {
+      "client_wall_s": 0.683417,
+      "cpu_s": 0.680556,
+      "http_status": 200,
+      "next_event": null,
+      "wall_s": 0.682541
+    },
+    "ingress": "HTTP JSON rrule_text supplied by client, passed to rrulestr",
+    "observed_head_of_line_delay": true,
+    "scope": "purpose-built single-worker service, loopback only"
+  },
+  "issue": "https://github.com/dateutil/dateutil/issues/1094",
+  "max_count": 300000,
+  "per_worker_timeout_s": 12,
+  "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+  "python": "3.15.0",
+  "research_commit": "03d604ee37d2ea45f92b47be24605399333a8d91",
+  "security_assessment": {
+    "CVE_eligibility": "unverified; no CVE requested or assigned",
+    "http_input_to_sink": "tested on local constructed demonstration service only",
+    "real_world_remote_exploit": "not established",
+    "resource_exhaustion": "bounded CPU cost confirmed if wall/CPU scaling observed"
+  },
+  "source": "upstream dateutil master independent non-fork copy",
+  "upstream_baseline_commit": "64914d9bcf987f0a6a8de77c3d07cc26f06185c9"
+}
