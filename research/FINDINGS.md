@@ -169,6 +169,20 @@ time for an unrelated normal request queued behind the expensive request,
 while its own computation was 0.000224 seconds. This is a *toy service*
 head-of-line delay, not a remotely exploited downstream product.
 
+The expanded two-job workflow also passed:
+https://github.com/Johnny-Kao/dateutil-security-research/actions/runs/40118291764
+
+Both `reproduce` and `downstream-integration` completed successfully and
+uploaded independent JSON artifacts. On that Linux run:
+- dateutil (Python 3.13.16), 300,000 all-excluded candidates: 1.716316
+  CPU seconds vs. 0.016145 for the immediate-result control.
+- Actual Times Square `RunSchedule.next()` (Python 3.14.8), 100,000
+  all-excluded candidates: 0.908381 CPU seconds vs. 0.000239 for the
+  immediate-result control.
+
+The pinned Times Square checkout and execution are local to the GitHub
+Actions job; no third-party service was contacted or assessed as vulnerable.
+
 ## E. CVE threshold — not established
 
 - The algorithmic cost was previously disclosed in issue #1094 (2020).
